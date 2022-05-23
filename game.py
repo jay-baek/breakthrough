@@ -1,5 +1,6 @@
 """My version of the classic Breakout game"""
 
+from Paddle import Paddle
 import pygame
 from pygame.locals import *
 
@@ -10,8 +11,16 @@ SCREEN_WIDTH, SCREEN_HEIGHT = SIZE
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('Breakthrough')
 
-paddle_size = 180, 20
-paddle = pygame.Rect((SCREEN_WIDTH/2, SCREEN_HEIGHT-70), paddle_size)
+
+paddle_width = 180
+paddle_height = 20
+paddle = Paddle(width=paddle_width, height=paddle_height, color=Color('red'))
+paddle.rect.x = SCREEN_WIDTH/2
+paddle.rect.y = SCREEN_HEIGHT-70
+
+all_sprites_list = pygame.sprite.Group()
+
+all_sprites_list.add(paddle)
 
 
 running = True
@@ -21,18 +30,20 @@ while running:
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
+
+        # Paddle Movement
         elif event.type == MOUSEMOTION:
-            paddle.x = event.pos[0] - (paddle_size[0]/2)
-            if paddle.x <= 0:
-                paddle.x = 0
-            elif paddle.x >= SCREEN_WIDTH - paddle_size[0]:
-                paddle.x = SCREEN_WIDTH - paddle_size[0]
+            paddle.rect.x = event.pos[0] - (paddle_width/2)
+            if paddle.rect.x <= 0:
+                paddle.rect.x = 0
+            elif paddle.rect.x >= SCREEN_WIDTH - paddle_width:
+                paddle.rect.x = SCREEN_WIDTH - paddle_width
 
-            # print(paddle.center)
 
+    all_sprites_list.update()
 
     screen.fill('gray')
-    pygame.draw.rect(screen, Color('red'), paddle)
+    all_sprites_list.draw(screen)
     pygame.display.update()
 
     clock.tick(60)
