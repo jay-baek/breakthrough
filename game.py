@@ -1,6 +1,7 @@
 """My version of the classic Breakout game"""
 
 from Paddle import Paddle
+from Ball import Ball
 import pygame
 from pygame.locals import *
 
@@ -18,9 +19,18 @@ paddle = Paddle(width=paddle_width, height=paddle_height, color=Color('red'))
 paddle.rect.x = SCREEN_WIDTH/2
 paddle.rect.y = SCREEN_HEIGHT-70
 
+ball_width = 20
+ball_height = 20
+ball = Ball(ball_width, ball_height, Color('blue'))
+ball.rect.x = 0
+ball.rect.y = SCREEN_HEIGHT-100
+
 all_sprites_list = pygame.sprite.Group()
 
 all_sprites_list.add(paddle)
+all_sprites_list.add(ball)
+
+ball_motion = [3,-3]
 
 
 running = True
@@ -39,6 +49,17 @@ while running:
             elif paddle.rect.x >= SCREEN_WIDTH - paddle_width:
                 paddle.rect.x = SCREEN_WIDTH - paddle_width
 
+    # Ball movement
+    if ball.rect.right > SCREEN_WIDTH:
+        ball_motion[0] *= -1
+    elif ball.rect.left < 0:
+        ball_motion[0] *= -1
+    elif ball.rect.top < 0:
+        ball_motion[1] *= -1
+    elif ball.rect.bottom > SCREEN_HEIGHT - 70:
+        ball_motion[1] *= -1
+
+    ball.rect.move_ip(ball_motion)
 
     all_sprites_list.update()
 
