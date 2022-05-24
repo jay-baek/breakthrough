@@ -34,12 +34,26 @@ ball_motion = [3,-3]
 
 
 running = True
+paused = False
 clock = pygame.time.Clock()
 
 while running:
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
+
+        elif event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                paused = True
+                # running = False
+                while paused:
+                    # running = False
+                    ans = input('Continue? (y/n): ')
+                    if ans == 'y':
+                        running = True
+                        paused = False
+                    else:
+                        pygame.quit()
 
         # Paddle Movement
         elif event.type == MOUSEMOTION:
@@ -56,8 +70,8 @@ while running:
         ball_motion[0] *= -1
     elif ball.rect.top < 0:
         ball_motion[1] *= -1
-    elif ball.rect.bottom > SCREEN_HEIGHT - 70:
-        ball_motion[1] *= -1
+    # elif ball.rect.bottom > SCREEN_HEIGHT - 70:
+    #     ball_motion[1] *= -1
 
     ball.rect.move_ip(ball_motion)
 
