@@ -26,15 +26,32 @@ ball.rect.x = 0
 ball.rect.y = SCREEN_HEIGHT-100
 
 brick_width, brick_height = 100, 50
-brick1 = Brick(100, 50, Color('green'))
-brick1.rect.x = 100
-brick1.rect.y = SCREEN_HEIGHT/10
+columns = 6
+gap = 20
+gap_brick_combo = 120
+x_coord_counter = 100
+
+brick_row_1 = list()
+
+for col in range(columns):
+    brick_row_1.append(Brick(100, 50, Color('green')))
+
+for i in brick_row_1:
+    i.rect.x = x_coord_counter
+    i.rect.y = SCREEN_HEIGHT/10
+    x_coord_counter += gap_brick_combo
+
+# brick1 = Brick(100, 50, Color('green'))
+# brick1.rect.x = 100
+# brick1.rect.y = SCREEN_HEIGHT/10
 
 all_sprites_list = pygame.sprite.Group()
 
 all_sprites_list.add(paddle)
-all_sprites_list.add(brick1)
+# all_sprites_list.add(brick1)
 all_sprites_list.add(ball)
+for i in brick_row_1:
+    all_sprites_list.add(i)
 
 ball_motion = [3,-3]
 
@@ -49,7 +66,7 @@ while running:
             running = False
 
         elif event.type == KEYDOWN:
-            
+
             # Pause game
             if event.key == K_ESCAPE:
                 paused = True
