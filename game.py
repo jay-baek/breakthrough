@@ -1,6 +1,7 @@
 """My version of the classic Breakout game"""
 
 from Paddle import Paddle
+from Brick import Brick
 from Ball import Ball
 import pygame
 from pygame.locals import *
@@ -19,15 +20,20 @@ paddle = Paddle(width=paddle_width, height=paddle_height, color=Color('red'))
 paddle.rect.x = SCREEN_WIDTH/2
 paddle.rect.y = SCREEN_HEIGHT-70
 
-ball_width = 20
-ball_height = 20
+ball_width, ball_height = 20, 20
 ball = Ball(ball_width, ball_height, Color('blue'))
 ball.rect.x = 0
 ball.rect.y = SCREEN_HEIGHT-100
 
+brick_width, brick_height = 100, 50
+brick1 = Brick(100, 50, Color('green'))
+brick1.rect.x = 100
+brick1.rect.y = SCREEN_HEIGHT/10
+
 all_sprites_list = pygame.sprite.Group()
 
 all_sprites_list.add(paddle)
+all_sprites_list.add(brick1)
 all_sprites_list.add(ball)
 
 ball_motion = [3,-3]
@@ -43,17 +49,17 @@ while running:
             running = False
 
         elif event.type == KEYDOWN:
+            
+            # Pause game
             if event.key == K_ESCAPE:
                 paused = True
-                # running = False
                 while paused:
-                    # running = False
-                    ans = input('Continue? (y/n): ')
-                    if ans == 'y':
-                        running = True
-                        paused = False
-                    else:
-                        pygame.quit()
+                    for event in pygame.event.get():
+                        if event.type == KEYDOWN:
+                            if event.key == K_ESCAPE:
+                                running = True
+                                paused = False
+
 
         # Paddle Movement
         elif event.type == MOUSEMOTION:
