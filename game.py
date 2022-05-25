@@ -24,34 +24,43 @@ ball_width, ball_height = 20, 20
 ball = Ball(ball_width, ball_height, Color('blue'))
 ball.rect.x = 0
 ball.rect.y = SCREEN_HEIGHT-100
-ball_motion = [3,-3]
+ball_motion = [5,-5]
 
 # Bricks
 brick_width, brick_height = 100, 50
 columns = 6
 gap = 20
+rows = 4
 gap_brick_combo = 120
-x_coord_counter = 100
-brick_row_1 = list()
-for col in range(columns):
-    brick_row_1.append(Brick(100, 50, Color('green')))
-for i in brick_row_1:
-    i.rect.x = x_coord_counter
-    i.rect.y = SCREEN_HEIGHT/10
-    x_coord_counter += gap_brick_combo
+x_coord_start = 100
+x_coord_counter = x_coord_start
+y_coord_start = SCREEN_HEIGHT/10
+brick_rows = list()
+# Construct Brick Rows
+for row in range(1, rows+1):
+    b_row = list()
+    for column in range(columns):
+        b_row.append(Brick(100, 50, Color('green')))
+    for brick in b_row:
+        brick.rect.x = x_coord_counter
+        brick.rect.y = y_coord_start * row
+        x_coord_counter += gap_brick_combo
+    x_coord_counter = x_coord_start
+    brick_rows.append(b_row)
 
 # Non-ball sprites list
 brick_sprites_list = pygame.sprite.Group()
-for i in brick_row_1:
-    brick_sprites_list.add(i)
-
+for row in brick_rows:
+    for brick in row:
+        brick_sprites_list.add(brick)
 
 # All sprites list
 all_sprites_list = pygame.sprite.Group()
 all_sprites_list.add(ball)
 all_sprites_list.add(paddle)
-for i in brick_row_1:
-    all_sprites_list.add(i)
+for row in brick_rows:
+    for brick in row:
+        all_sprites_list.add(brick)
 
 running = True
 paused = False
@@ -83,9 +92,8 @@ while running:
             elif paddle.rect.right >= SCREEN_WIDTH:
                 paddle.rect.right = SCREEN_WIDTH
 
-
-
     # Ball collision
+    # PROBLEM: THE COLLISION IS ALWAYS DETECTED AS A TOP OR BOTTOM COLLISION.
     brick_collide_list = pygame.sprite.spritecollide(ball, brick_sprites_list, False)
     for brick in brick_collide_list:
         print(f"COLLISION WK BALL: {brick}")
@@ -97,9 +105,6 @@ while running:
             ball_motion[0] *= -1
         all_sprites_list.remove(brick)
         brick_sprites_list.remove(brick)
-
-
-
 
     # Ball movement
     if ball.rect.right > SCREEN_WIDTH:
@@ -113,7 +118,6 @@ while running:
     if ball.rect.colliderect(paddle.rect):
         # ball_motion[0] *= -1
         ball_motion[1] *= -1
-
 
     ball.rect.move_ip(ball_motion)
 
