@@ -78,21 +78,27 @@ while running:
         # Paddle Movement
         elif event.type == MOUSEMOTION:
             paddle.rect.x = event.pos[0] - (paddle_width/2)
-            # if ball.rect.colliderect(paddle.rect):
-            #     ball_motion[0] *= -1
-            #     ball_motion[1] *= -1
-            #     break
-            if paddle.rect.x <= 0:
-                paddle.rect.x = 0
-            elif paddle.rect.x >= SCREEN_WIDTH - paddle_width:
-                paddle.rect.x = SCREEN_WIDTH - paddle_width
+            if paddle.rect.left <= 0:
+                paddle.rect.left = 0
+            elif paddle.rect.right >= SCREEN_WIDTH:
+                paddle.rect.right = SCREEN_WIDTH
 
 
 
     # Ball collision
     brick_collide_list = pygame.sprite.spritecollide(ball, brick_sprites_list, False)
-    for num, obj in enumerate(brick_collide_list):
-        print(f"{num} : COLLISION W BALL: {obj}")
+    for brick in brick_collide_list:
+        print(f"COLLISION WK BALL: {brick}")
+        if brick.rect.top <= ball.rect.bottom or brick.rect.bottom >= ball.rect.top:
+            print('1')
+            ball_motion[1] *= -1
+        elif brick.rect.right >= ball.rect.left or brick.rect.left <= ball.rect.right:
+            print('2')
+            ball_motion[0] *= -1
+        all_sprites_list.remove(brick)
+        brick_sprites_list.remove(brick)
+
+
 
 
     # Ball movement
