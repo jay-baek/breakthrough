@@ -14,27 +14,27 @@ screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('Breakthrough')
 
 
-paddle_width = 180
+paddle_width = 150
 paddle_height = 20
 paddle = Paddle(width=paddle_width, height=paddle_height, color=Color('red'))
 paddle.rect.x = SCREEN_WIDTH/2
 paddle.rect.y = SCREEN_HEIGHT-70
 
 ball_width, ball_height = 20, 20
-ball = Ball(ball_width, ball_height, Color('blue'))
+ball = Ball(ball_width, ball_height, img='ball.png')
 ball.rect.x = 0
 ball.rect.y = SCREEN_HEIGHT-100
 ball_motion = [5,-5]
 
 # Bricks
-brick_width, brick_height = 100, 50
+brick_width, brick_height = 100, 15
 columns = 6
 gap = 20
 rows = 4
 gap_brick_combo = 120
 x_coord_start = 100
 x_coord_counter = x_coord_start
-y_coord_start = SCREEN_HEIGHT/10
+y_coord_current = SCREEN_HEIGHT/10
 brick_rows = list()
 # Construct Brick Rows
 for row in range(1, rows+1):
@@ -43,9 +43,10 @@ for row in range(1, rows+1):
         b_row.append(Brick(100, 50, Color('green')))
     for brick in b_row:
         brick.rect.x = x_coord_counter
-        brick.rect.y = y_coord_start * row
+        brick.rect.y = y_coord_current + (row * (brick_height + gap))
         x_coord_counter += gap_brick_combo
     x_coord_counter = x_coord_start
+    y_coord_current += brick_height + gap
     brick_rows.append(b_row)
 
 # Non-ball sprites list
@@ -65,6 +66,8 @@ for row in brick_rows:
 running = True
 paused = False
 clock = pygame.time.Clock()
+
+collision_buffer = 6
 
 while running:
     for event in pygame.event.get():
@@ -97,14 +100,36 @@ while running:
     brick_collide_list = pygame.sprite.spritecollide(ball, brick_sprites_list, False)
     for brick in brick_collide_list:
         print(f"COLLISION WK BALL: {brick}")
-        if brick.rect.top <= ball.rect.bottom or brick.rect.bottom >= ball.rect.top:
-            print('1')
-            ball_motion[1] *= -1
-        elif brick.rect.right >= ball.rect.left or brick.rect.left <= ball.rect.right:
-            print('2')
+        print(f'BALL RECT TOP = {ball.rect.top}')
+        print(f'BRICK RECT BOTTOM = {brick.rect.bottom}')
+        if ball.rect.right in [i for i in range(brick.rect.left, brick.rect.left+collision_buffer)]:
+            print('HIT 3')
             ball_motion[0] *= -1
+        elif ball.rect.left in [i for i in range(brick.rect.right-collision_buffer, brick.rect.right)]:
+            print('HIT 1')
+            ball_motion[0] *= -1
+        elif ball.rect.top in [i for i in range(brick.rect.bottom-collision_buffer, brick.rect.bottom)]:
+            print('HIT 1')
+            ball_motion[1] *= -1
+        elif ball.rect.bottom in [i for i in range(brick.rect.top, brick.rect.bottom+collision_buffer)]:
+            print('HIT 2')
+            ball_motion[1] *= -1
+
+
+
+
+
+        # if brick.rect.top <= ball.rect.bottom or brick.rect.bottom >= ball.rect.top:
+        #     print('1')
+        #     ball_motion[1] *= -1
+        # elif brick.rect.right >= ball.rect.left or brick.rect.left <= ball.rect.right:
+        #     print('2')
+        #     ball_motion[0] *= -1
         all_sprites_list.remove(brick)
         brick_sprites_list.remove(brick)
+
+    # print(ball.rect.bottom)
+    print(ball.rect.top)
 
     # Ball movement
     if ball.rect.right > SCREEN_WIDTH:
