@@ -8,9 +8,14 @@ from pygame.locals import *
 
 pygame.init()
 
+bkg_img = pygame.image.load('bkg_test.png')
+# bkg_img.convert()
+bkg_rect = bkg_img.get_rect()
+
 SIZE = 900, 1100
 SCREEN_WIDTH, SCREEN_HEIGHT = SIZE
-screen = pygame.display.set_mode(SIZE)
+# screen = pygame.display.set_mode(SIZE)
+screen = pygame.display.set_mode(bkg_rect.size)
 pygame.display.set_caption('Breakthrough')
 
 
@@ -24,23 +29,23 @@ ball_width, ball_height = 20, 20
 ball = Ball(ball_width, ball_height, img='ball.png')
 ball.rect.x = 0
 ball.rect.y = SCREEN_HEIGHT-100
-ball_motion = [5,-5]
+ball_motion = [7,-7]
 
 # Bricks
-brick_width, brick_height = 100, 15
-columns = 6
-gap = 20
+brick_width, brick_height = 100, 30
+columns = 7
+gap = 10
 rows = 4
 gap_brick_combo = 120
-x_coord_start = 100
+x_coord_start = 50
 x_coord_counter = x_coord_start
-y_coord_current = SCREEN_HEIGHT/10
+y_coord_current = SCREEN_HEIGHT/5
 brick_rows = list()
 # Construct Brick Rows
 for row in range(1, rows+1):
     b_row = list()
     for column in range(columns):
-        b_row.append(Brick(100, 50, Color('green')))
+        b_row.append(Brick(brick_width, brick_height, Color('green')))
     for brick in b_row:
         brick.rect.x = x_coord_counter
         brick.rect.y = y_coord_current + (row * (brick_height + gap))
@@ -86,7 +91,6 @@ while running:
                                 running = True
                                 paused = False
 
-
         # Paddle Movement
         elif event.type == MOUSEMOTION:
             paddle.rect.x = event.pos[0] - (paddle_width/2)
@@ -115,10 +119,6 @@ while running:
             print('HIT 2')
             ball_motion[1] *= -1
 
-
-
-
-
         # if brick.rect.top <= ball.rect.bottom or brick.rect.bottom >= ball.rect.top:
         #     print('1')
         #     ball_motion[1] *= -1
@@ -129,7 +129,7 @@ while running:
         brick_sprites_list.remove(brick)
 
     # print(ball.rect.bottom)
-    print(ball.rect.top)
+    # print(ball.rect.top)
 
     # Ball movement
     if ball.rect.right > SCREEN_WIDTH:
@@ -148,10 +148,11 @@ while running:
 
     all_sprites_list.update()
 
-    screen.fill('gray')
+    # screen.fill('gray')
+    screen.blit(bkg_img, bkg_rect)
     all_sprites_list.draw(screen)
     pygame.display.update()
 
-    clock.tick(60)
+    clock.tick(90)
 
 pygame.quit()
