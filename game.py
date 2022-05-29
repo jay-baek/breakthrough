@@ -76,6 +76,11 @@ clock = pygame.time.Clock()
 
 collision_buffer = 7
 
+# brick.rect.center coords to store past values to compare and determine ball direction
+# start with two fillers so [-2] and [-1] are not out of bounds
+brc_x = [0,0]
+brc_y = [0,0]
+
 while running:
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -102,35 +107,59 @@ while running:
                 paddle.rect.right = SCREEN_WIDTH
 
     # Ball collision
-    # PROBLEM: THE COLLISION IS ALWAYS DETECTED AS A TOP OR BOTTOM COLLISION.
+    # print(f'brc_x = {brc_x}')
+    # print(f'brc_y = {brc_y}')
+    # print(f'ball.rect.center = {ball.rect.center}')
     brick_collide_list = pygame.sprite.spritecollide(ball, brick_sprites_list, False)
     for brick in brick_collide_list:
         print(f"COLLISION WK BALL: {brick}")
+        # print(f'brc_x[-2] = {brc_x[len(brc_x)-1]}')
         # print(f'BALL RECT TOP = {ball.rect.top}')
         # print(f'BRICK RECT BOTTOM = {brick.rect.bottom}')
-        if ball.rect.right in [i for i in range(brick.rect.left, brick.rect.left+collision_buffer)]:
-            # print('HIT R')
-            ball_motion[0] *= -1
-        elif ball.rect.left in [i for i in range(brick.rect.right-collision_buffer, brick.rect.right)]:
-            # print('HIT L')
-            ball_motion[0] *= -1
-        elif ball.rect.top in [i for i in range(brick.rect.bottom-collision_buffer, brick.rect.bottom)]:
-            # print('HIT TOP')
-            ball_motion[1] *= -1
-        elif ball.rect.bottom in [i for i in range(brick.rect.top, brick.rect.bottom+collision_buffer)]:
-            # print('HIT BOTTOM')
-            ball_motion[1] *= -1
+
+        # ball is moving down+right
+        # if (brc[0] - ball.rect.center[0]) < 0 and (brc[1] - ball.rect.center[1]) < 0:
+        if (brc_x[-2] - brc_x[-1]) < 0 and (brc_y[-2] - brc_y[-1]) < 0:
+            print('down+right')
+            if ball.rect.right in [i for i in range(brick.rect.left, brick.rect.left+collision_buffer)]:
+                print('BALL HIT L')
+                ball_motion[0] *= -1
+            elif ball.rect.bottom in [i for i in range(brick.rect.top, brick.rect.top+collision_buffer)]:
+                print('BALL HIT BOTTOM')
+                ball_motion[1] *= -1
+        # ball is moving down+left
+        # elif (brc[0] - ball.rect.center[0]) > 0 and (brc[1] - ball.rect.center[1]) < 0:
+        elif (brc_x[-2] - brc_x[-1]) > 0 and (brc_y[-2] - brc_y[-1]) < 0:
+            print('down+left')
+            if ball.rect.left in [i for i in range(brick.rect.right-collision_buffer, brick.rect.right)]:
+                print('BALL HIT R')
+                ball_motion[0] *= -1
+            elif ball.rect.bottom in [i for i in range(brick.rect.top, brick.rect.top+collision_buffer)]:
+                print('BALL HIT BOTTOM')
+                ball_motion[1] *= -1
+        # ball is moving up+right
+        # elif (brc[0] - ball.rect.center[0]) < 0 and (brc[1] - ball.rect.center[1]) > 0:
+        elif (brc_x[-2] - brc_x[-1]) < 0 and (brc_y[-2] - brc_y[-1]) > 0:
+            print('up+right')
+            if ball.rect.right in [i for i in range(brick.rect.left, brick.rect.left+collision_buffer)]:
+                print('BALL HIT L')
+                ball_motion[0] *= -1
+            elif ball.rect.top in [i for i in range(brick.rect.bottom-collision_buffer, brick.rect.bottom)]:
+                print('BALL HIT BOTTOM')
+                ball_motion[1] *= -1
+         # ball is moving up+left
+        # elif (brc[0] - ball.rect.center[0]) > 0 and (brc[1] - ball.rect.center[1]) > 0:
+        elif (brc_x[-2] - brc_x[-1]) > 0 and (brc_y[-2] - brc_y[-1]) > 0:
+            print('up+left')
+            if ball.rect.left in [i for i in range(brick.rect.right-collision_buffer, brick.rect.right)]:
+                print('BALL HIT R')
+                ball_motion[0] *= -1
+            elif ball.rect.top in [i for i in range(brick.rect.bottom-collision_buffer, brick.rect.bottom)]:
+                print('BALL HIT BOTTOM')
+                ball_motion[1] *= -1
         else:
-            xy = random.choice([0, 1])
-            ball_motion[xy] *= -1
+            print('WUT')
 
-
-        # if brick.rect.top <= ball.rect.bottom or brick.rect.bottom >= ball.rect.top:
-        #     print('1')
-        #     ball_motion[1] *= -1
-        # elif brick.rect.right >= ball.rect.left or brick.rect.left <= ball.rect.right:
-        #     print('2')
-        #     ball_motion[0] *= -1
         all_sprites_list.remove(brick)
         brick_sprites_list.remove(brick)
 
@@ -151,6 +180,11 @@ while running:
         ball_motion[1] *= -1
 
     ball.rect.move_ip(ball_motion)
+
+    brc_x.append(ball.rect.center[0])
+    brc_y.append(ball.rect.center[1])
+    brc_x.pop(0)
+    brc_y.pop(0)
 
     all_sprites_list.update()
 
