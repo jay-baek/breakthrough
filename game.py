@@ -34,10 +34,11 @@ ball_motion = [7,-7]
 
 # Bricks
 brick_width, brick_height = 100, 30
-columns = 7
-gap = 10
+columns = 8
+gap_horiz = 0
+gap_vertical = 0
 rows = 4
-gap_brick_combo = 120
+gap_brick_sum = gap_horiz + brick_width
 x_coord_start = 50
 x_coord_counter = x_coord_start
 y_coord_current = SCREEN_HEIGHT/5
@@ -49,10 +50,10 @@ for row in range(1, rows+1):
         b_row.append(Brick(brick_width, brick_height, Color('green')))
     for brick in b_row:
         brick.rect.x = x_coord_counter
-        brick.rect.y = y_coord_current + (row * (brick_height + gap))
-        x_coord_counter += gap_brick_combo
+        brick.rect.y = y_coord_current + brick_height + gap_vertical
+        x_coord_counter += gap_brick_sum
     x_coord_counter = x_coord_start
-    y_coord_current += brick_height + gap
+    y_coord_current += brick_height + gap_vertical
     brick_rows.append(b_row)
 
 # Non-ball sprites list
@@ -73,7 +74,7 @@ running = True
 paused = False
 clock = pygame.time.Clock()
 
-collision_buffer = 6
+collision_buffer = 7
 
 while running:
     for event in pygame.event.get():
@@ -158,6 +159,6 @@ while running:
     all_sprites_list.draw(screen)
     pygame.display.update()
 
-    clock.tick(90)
+    clock.tick(60)
 
 pygame.quit()

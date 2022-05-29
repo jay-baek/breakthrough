@@ -18,7 +18,7 @@ class Brick(pygame.sprite.Sprite):
         self.height = height
         self.color = color
 
-        pygame.draw.rect(self.image, self.color, [0,0,self.width,self.height])
+        pygame.draw.rect(self.image, self.color, [0,0,self.width,self.height], 2)
 
         self.rect = self.image.get_rect()
 
