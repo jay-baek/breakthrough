@@ -5,6 +5,7 @@ from Brick import Brick
 from Ball import Ball
 import pygame
 from pygame.locals import *
+import random
 
 pygame.init()
 
@@ -104,20 +105,24 @@ while running:
     brick_collide_list = pygame.sprite.spritecollide(ball, brick_sprites_list, False)
     for brick in brick_collide_list:
         print(f"COLLISION WK BALL: {brick}")
-        print(f'BALL RECT TOP = {ball.rect.top}')
-        print(f'BRICK RECT BOTTOM = {brick.rect.bottom}')
+        # print(f'BALL RECT TOP = {ball.rect.top}')
+        # print(f'BRICK RECT BOTTOM = {brick.rect.bottom}')
         if ball.rect.right in [i for i in range(brick.rect.left, brick.rect.left+collision_buffer)]:
-            print('HIT 3')
+            # print('HIT R')
             ball_motion[0] *= -1
         elif ball.rect.left in [i for i in range(brick.rect.right-collision_buffer, brick.rect.right)]:
-            print('HIT 1')
+            # print('HIT L')
             ball_motion[0] *= -1
         elif ball.rect.top in [i for i in range(brick.rect.bottom-collision_buffer, brick.rect.bottom)]:
-            print('HIT 1')
+            # print('HIT TOP')
             ball_motion[1] *= -1
         elif ball.rect.bottom in [i for i in range(brick.rect.top, brick.rect.bottom+collision_buffer)]:
-            print('HIT 2')
+            # print('HIT BOTTOM')
             ball_motion[1] *= -1
+        else:
+            xy = random.choice([0, 1])
+            ball_motion[xy] *= -1
+
 
         # if brick.rect.top <= ball.rect.bottom or brick.rect.bottom >= ball.rect.top:
         #     print('1')
