@@ -20,11 +20,17 @@ screen = pygame.display.set_mode(bkg_rect.size)
 pygame.display.set_caption('Breakthrough')
 
 
-paddle_width = 150
-paddle_height = 20
-paddle = Paddle(width=paddle_width, height=paddle_height, color=Color('red'))
-paddle.rect.x = SCREEN_WIDTH/2
-paddle.rect.y = SCREEN_HEIGHT-70
+paddle1_width = 70
+paddle1_height = 20
+paddle1 = Paddle(width=paddle1_width, height=paddle1_height, color=Color('red'))
+paddle1.rect.x = SCREEN_WIDTH/2
+paddle1.rect.y = SCREEN_HEIGHT-70
+
+paddle2_width = 70
+paddle2_height = 20
+paddle2 = Paddle(width=paddle2_width, height=paddle2_height, color=Color('yellow'))
+paddle2.rect.x = SCREEN_WIDTH/2 + paddle1_width
+paddle2.rect.y = SCREEN_HEIGHT-70
 
 ball_width, ball_height = 20, 20
 ball = Ball(ball_width, ball_height, img='ball.png')
@@ -65,7 +71,8 @@ for row in brick_rows:
 # All sprites list
 all_sprites_list = pygame.sprite.Group()
 all_sprites_list.add(ball)
-all_sprites_list.add(paddle)
+all_sprites_list.add(paddle1)
+all_sprites_list.add(paddle2)
 for row in brick_rows:
     for brick in row:
         all_sprites_list.add(brick)
@@ -98,15 +105,22 @@ while running:
                                 running = True
                                 paused = False
 
-        # Paddle Movement
+        # Paddle1 Movement
         elif event.type == MOUSEMOTION:
-            paddle.rect.x = event.pos[0] - (paddle_width/2)
-            if paddle.rect.left <= 0:
-                paddle.rect.left = 0
-            elif paddle.rect.right >= SCREEN_WIDTH:
-                paddle.rect.right = SCREEN_WIDTH
+            paddle1.rect.x = event.pos[0] - (paddle1_width)
+            paddle2.rect.x = event.pos[0]
+            if paddle1.rect.left <= 0:
+                paddle1.rect.left = 0
+                paddle2.rect.left = paddle1.rect.width
+            elif paddle2.rect.right >= SCREEN_WIDTH:
+                paddle2.rect.right = SCREEN_WIDTH
+                paddle1.rect.right = SCREEN_WIDTH - paddle1.rect.width
 
     # Ball collision
+
+    x_diff = brc_x[-2] - brc_x[-1]
+    y_diff = brc_y[-2] - brc_y[-1]
+
     # print(f'brc_x = {brc_x}')
     # print(f'brc_y = {brc_y}')
     # print(f'ball.rect.center = {ball.rect.center}')
@@ -118,7 +132,7 @@ while running:
         # print(f'BRICK RECT BOTTOM = {brick.rect.bottom}')
 
         # ball is moving down+right
-        if (brc_x[-2] - brc_x[-1]) < 0 and (brc_y[-2] - brc_y[-1]) < 0:
+        if x_diff < 0 and y_diff < 0:
             print('down+right')
             if ball.rect.right in [i for i in range(brick.rect.left, brick.rect.left+collision_buffer)]:
                 print('BALL HIT L')
@@ -127,7 +141,7 @@ while running:
                 print('BALL HIT BOTTOM')
                 ball_motion[1] *= -1
         # ball is moving down+left
-        elif (brc_x[-2] - brc_x[-1]) > 0 and (brc_y[-2] - brc_y[-1]) < 0:
+        elif x_diff > 0 and y_diff < 0:
             print('down+left')
             if ball.rect.left in [i for i in range(brick.rect.right-collision_buffer, brick.rect.right)]:
                 print('BALL HIT R')
@@ -136,7 +150,7 @@ while running:
                 print('BALL HIT BOTTOM')
                 ball_motion[1] *= -1
         # ball is moving up+right
-        elif (brc_x[-2] - brc_x[-1]) < 0 and (brc_y[-2] - brc_y[-1]) > 0:
+        elif x_diff < 0 and y_diff > 0:
             print('up+right')
             if ball.rect.right in [i for i in range(brick.rect.left, brick.rect.left+collision_buffer)]:
                 print('BALL HIT L')
@@ -145,7 +159,7 @@ while running:
                 print('BALL HIT BOTTOM')
                 ball_motion[1] *= -1
          # ball is moving up+left
-        elif (brc_x[-2] - brc_x[-1]) > 0 and (brc_y[-2] - brc_y[-1]) > 0:
+        elif x_diff > 0 and y_diff > 0:
             print('up+left')
             if ball.rect.left in [i for i in range(brick.rect.right-collision_buffer, brick.rect.right)]:
                 print('BALL HIT R')
@@ -169,11 +183,14 @@ while running:
         ball_motion[0] *= -1
     elif ball.rect.top < 0:
         ball_motion[1] *= -1
-    # elif ball.rect.bottom > SCREEN_HEIGHT - 70:
-    #     ball_motion[1] *= -1
-    if ball.rect.colliderect(paddle.rect):
-        # ball_motion[0] *= -1
+
+
+    if ball.rect.colliderect(paddle1.rect):
         ball_motion[1] *= -1
+        ball_motion[0] = ball_motion[0] * -1 if x_diff < 0 else ball_motion[0]
+    elif ball.rect.colliderect(paddle2.rect):
+        ball_motion[1] *= -1
+        ball_motion[0] = ball_motion[0] * -1 if x_diff > 0 else ball_motion[0]
 
     ball.rect.move_ip(ball_motion)
 
