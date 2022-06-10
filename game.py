@@ -19,18 +19,23 @@ SCREEN_WIDTH, SCREEN_HEIGHT = SIZE
 screen = pygame.display.set_mode(bkg_rect.size)
 pygame.display.set_caption('Breakthrough')
 
+paddle_seg_width = 40
+paddle_height = 20
 
-paddle1_width = 70
-paddle1_height = 20
-paddle1 = Paddle(width=paddle1_width, height=paddle1_height, color=Color('red'))
+paddle1_width = paddle_seg_width
+paddle1 = Paddle(width=paddle1_width, height=paddle_height, color=Color('red'))
 paddle1.rect.x = SCREEN_WIDTH/2
 paddle1.rect.y = SCREEN_HEIGHT-70
 
-paddle2_width = 70
-paddle2_height = 20
-paddle2 = Paddle(width=paddle2_width, height=paddle2_height, color=Color('yellow'))
-paddle2.rect.x = SCREEN_WIDTH/2 + paddle1_width
+paddle2_width = paddle_seg_width
+paddle2 = Paddle(width=paddle2_width, height=paddle_height, color=Color('yellow'))
+paddle2.rect.x = SCREEN_WIDTH/2 + paddle_seg_width
 paddle2.rect.y = SCREEN_HEIGHT-70
+
+paddle3_width = paddle_seg_width
+paddle3 = Paddle(width=paddle3_width, height=paddle_height, color=Color('blue'))
+paddle3.rect.x = SCREEN_WIDTH/2 + (paddle_seg_width * 2)
+paddle3.rect.y = SCREEN_HEIGHT-70
 
 ball_width, ball_height = 20, 20
 ball = Ball(ball_width, ball_height, img='ball.png')
@@ -73,6 +78,7 @@ all_sprites_list = pygame.sprite.Group()
 all_sprites_list.add(ball)
 all_sprites_list.add(paddle1)
 all_sprites_list.add(paddle2)
+all_sprites_list.add(paddle3)
 for row in brick_rows:
     for brick in row:
         all_sprites_list.add(brick)
@@ -107,14 +113,17 @@ while running:
 
         # Paddle1 Movement
         elif event.type == MOUSEMOTION:
-            paddle1.rect.x = event.pos[0] - (paddle1_width)
+            paddle1.rect.x = event.pos[0] - (paddle_seg_width)
             paddle2.rect.x = event.pos[0]
+            paddle3.rect.x = event.pos[0] + (paddle_seg_width)
             if paddle1.rect.left <= 0:
                 paddle1.rect.left = 0
-                paddle2.rect.left = paddle1.rect.width
-            elif paddle2.rect.right >= SCREEN_WIDTH:
-                paddle2.rect.right = SCREEN_WIDTH
-                paddle1.rect.right = SCREEN_WIDTH - paddle1.rect.width
+                paddle2.rect.left = paddle_seg_width
+                paddle3.rect.left = paddle_seg_width * 2
+            elif paddle3.rect.right >= SCREEN_WIDTH:
+                paddle1.rect.right = SCREEN_WIDTH - (paddle_seg_width * 2)
+                paddle2.rect.right = SCREEN_WIDTH - paddle_seg_width
+                paddle3.rect.right = SCREEN_WIDTH
 
     # Ball collision
 
@@ -189,6 +198,9 @@ while running:
         ball_motion[1] *= -1
         ball_motion[0] = ball_motion[0] * -1 if x_diff < 0 else ball_motion[0]
     elif ball.rect.colliderect(paddle2.rect):
+        ball_motion[1] *= -1
+        # ball_motion[0] = ball_motion[0] * -1 if x_diff > 0 else ball_motion[0]
+    elif ball.rect.colliderect(paddle3.rect):
         ball_motion[1] *= -1
         ball_motion[0] = ball_motion[0] * -1 if x_diff > 0 else ball_motion[0]
 
